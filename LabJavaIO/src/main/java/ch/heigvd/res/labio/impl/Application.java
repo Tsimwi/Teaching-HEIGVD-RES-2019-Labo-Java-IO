@@ -7,10 +7,9 @@ import ch.heigvd.res.labio.interfaces.IFileExplorer;
 import ch.heigvd.res.labio.interfaces.IFileVisitor;
 import ch.heigvd.res.labio.quotes.QuoteClient;
 import ch.heigvd.res.labio.quotes.Quote;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
+
+import java.io.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
@@ -90,6 +89,8 @@ public class Application implements IApplication {
        * one method provided by this class, which is responsible for storing the content of the
        * quote in a text file (and for generating the directories based on the tags).
        */
+      this.storeQuote(quote, "quote-" + (i+1) + ".utf8");
+
       LOG.info("Received a new joke with " + quote.getTags().size() + " tags.");
       for (String tag : quote.getTags()) {
         LOG.info("> " + tag);
@@ -123,7 +124,23 @@ public class Application implements IApplication {
    * @throws IOException 
    */
   void storeQuote(Quote quote, String filename) throws IOException {
-    throw new UnsupportedOperationException("The student has not implemented this method yet.");
+    /* Get tag list and create sub-folders */
+    List<String> quotes = quote.getTags();
+    String directory = WORKSPACE_DIRECTORY;
+
+    for(String tag : quotes) {
+      directory += "/";
+      directory += tag;
+    }
+
+    new File(directory).mkdirs();
+
+    Writer writer = new OutputStreamWriter(new FileOutputStream(directory + "/" + filename), "UTF-8");
+
+    /* Store quote text into quote file */
+    String text = quote.getQuote();
+    writer.write(text);
+    writer.close();
   }
   
   /**
